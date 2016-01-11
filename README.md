@@ -1,5 +1,9 @@
 # RunningStat
 
+[![Build Status](https://travis-ci.org/anujdas/running_stat.png?branch=master)](https://travis-ci.org/anujdas/running_stat)
+
+[![Gem Version](https://badge.fury.io/rb/running_stat.png)](http://badge.fury.io/rb/running_stat)
+
 RunningStat provides distributed redis-backed data buckets on which various statistics are calculated live without storing the datapoints themselves: cardinality, average (arithmetic mean), standard deviation, and variance. Numbers (integer or float) can be pushed into buckets atomically. The space and time overhead for each metric is constant and invariant under data cardinality.
 
 The algorithm used is based on Knuth's TAOCP and is numerically stable; a brief writeup is available on Wikipedia under [Algorithms for calculating online variances](https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Online_algorithm).

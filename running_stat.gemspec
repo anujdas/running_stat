@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Anuj Das']
   spec.email         = ['anujdas@gmail.com']
 
-  spec.summary       = %q{An online mean, variance, and standard deviation metric}
+  spec.summary       = %q{A distributed streaming mean, variance, and standard deviation metric}
   spec.description   = %q{Using redis, allows statistics calculations on a streaming set of data without storing every value}
   spec.homepage      = 'https://www.github.com/anujdas/running_stat'
   spec.license       = 'MIT'
