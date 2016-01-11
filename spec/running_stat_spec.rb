@@ -13,7 +13,7 @@ describe RunningStat do
       data.each do |datum|
         RunningStat.instance(bucket).push(datum)
       end
-      expect(running_stat.cardinality).to eq data.size
+      expect(running_stat.cardinality).to eq data.count
     end
 
     it 'defaults to Redis.current' do
@@ -68,8 +68,8 @@ describe RunningStat do
 
     it 'increments with each insertion' do
       data.each do |datum|
-        expect { running_stat.push(datum) }
-          .to change { running_stat.cardinality }.by(1)
+        expect { running_stat.push(datum) }.
+          to change { running_stat.cardinality }.by(1)
       end
     end
   end
@@ -143,9 +143,8 @@ describe RunningStat do
   describe '#flush' do
     before { data.each { |datum| running_stat.push(datum) } }
     it 'resets the stat bucket' do
-      expect { running_stat.flush }
-        .to change { running_stat.cardinality }
-        .from(data.size).to(0)
+      expect { running_stat.flush }.
+        to change { running_stat.cardinality }.from(data.count).to(0)
       expect(running_stat.mean).to eq 0
     end
   end
