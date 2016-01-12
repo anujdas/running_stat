@@ -8,6 +8,8 @@ RunningStat provides distributed redis-backed data buckets on which various stat
 
 The algorithm used is based on Knuth's TAOCP and is numerically stable; a brief writeup is available on Wikipedia under [Algorithms for calculating online variances](https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Online_algorithm).
 
+RunningStat supports pretty much all versions of ruby, including MRI 1.8.7, 1.9.3, 2.2, and JRuby 1.7/9k.
+
 Disclaimer: Because it uses atomic Lua scripting, RunningStat requires redis 2.6+.
 
 
