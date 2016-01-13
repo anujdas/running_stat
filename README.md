@@ -6,6 +6,12 @@
 
 RunningStat provides distributed redis-backed data buckets on which various statistics are calculated live without storing the datapoints themselves: cardinality, average (arithmetic mean), standard deviation, and variance. Numbers (integer or float) can be pushed into buckets atomically. The space and time overhead for each metric is constant and invariant under data cardinality.
 
+RunningStat is especially useful in applications such as:
+- logging unusually large requests, i.e., > 2 standard deviations outside the mean
+- tracking metrics about interaction behaviour patterns, like engagement times
+
+In these cases and others, RunningStat provides up-to-date information without the time and storage overhead of saving a growing dataset.
+
 The algorithm used is based on Knuth's TAOCP and is numerically stable; a brief writeup is available on Wikipedia under [Algorithms for calculating online variances](https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Online_algorithm).
 
 RunningStat supports pretty much all versions of ruby, including MRI 1.8.7, 1.9.3, 2.2, and JRuby 1.7/9k.
@@ -51,7 +57,7 @@ At any point, you can obtain stats about the data seen so far in a given bucket:
 
 Reads and writes are both O(1); stats are calculated on insert, so reads are fast.
 
-Note that by definition, none of the statistics except cardinality are defined for datasets of cardinality < 2; you'll see a RunningStat::InsufficientDataError raised instead.
+Note that by definition, standard deviation and sample variance are undefined for datasets of cardinality < 2; you'll see a RunningStat::InsufficientDataError raised instead.
 
 
 ## Installation
@@ -73,7 +79,9 @@ Or install it yourself as:
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+After checking out the repo, run `bundle install` to install dependencies. Then, run `rake spec` to run the tests. RunningStat's specs require a running redis server on localhost:6379 because no Ruby redis mock supports Lua scripting yet. Note that running the specs *WILL MODIFY* some contents on your redis instance; save your data beforehand if it is important.
+
+You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
 To install this gem onto your local machine, run `bundle exec rake install`.
 
@@ -81,3 +89,8 @@ To install this gem onto your local machine, run `bundle exec rake install`.
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
+
+
+## Contributing
+
+Contributions are welcome. [Fork the project](https://github.com/anujdas/running_stat) and send pull requests.
