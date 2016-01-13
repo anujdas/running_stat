@@ -2,12 +2,16 @@ require 'spec_helper'
 
 describe RunningStat do
   let(:bucket) { 'test_bucket' }
-  let(:count_field) { described_class::RedisBackend::COUNT_FIELD }
 
   subject(:running_stat) { RunningStat.instance(bucket) }
 
+  let(:bucket_key) { running_stat.send(:bucket_key) }
+  let(:count_field) { described_class::RedisBackend::COUNT_FIELD }
+
   let(:data) { 1..10 }
   let(:epsilon) { 0.000001 }  # close enough for rounding errors
+
+  after { Redis.current.del(bucket_key) }  # teardown
 
   describe '.instance' do
     it 'allows operations on a data bucket given only its name' do
@@ -19,17 +23,16 @@ describe RunningStat do
 
     it 'defaults to Redis.current' do
       RunningStat.instance(bucket).push(data.first)
-      expect(Redis.current.exists(running_stat.send(:bucket_key))).to be_truthy
+      expect(Redis.current.exists(bucket_key)).to be_truthy
     end
 
     context 'with an explicit redis connection' do
       let(:alt_redis) { Redis.new(:db => 1) }
-      before { alt_redis.flushdb }
-      after { alt_redis.flushdb }
+      after { alt_redis.del(bucket_key) }  # teardown
       it 'uses the alternate redis connection' do
         RunningStat.instance(bucket, :redis => alt_redis).push(data.first)
-        expect(Redis.current.exists(running_stat.send(:bucket_key))).to be_falsey
-        expect(alt_redis.exists(running_stat.send(:bucket_key))).to be_truthy
+        expect(Redis.current.exists(bucket_key)).to be_falsey
+        expect(alt_redis.exists(bucket_key)).to be_truthy
       end
     end
   end
@@ -38,8 +41,8 @@ describe RunningStat do
     context 'with no data points' do
       before { running_stat.push(data.first) }
       it 'creates the bucket and adds the data point' do
-        expect(Redis.current.exists(running_stat.send(:bucket_key))).to be_truthy
-        expect(Redis.current.hget(running_stat.send(:bucket_key), count_field)).to eq '1'
+        expect(Redis.current.exists(bucket_key)).to be_truthy
+        expect(Redis.current.hget(bucket_key, count_field)).to eq '1'
       end
     end
 
@@ -49,7 +52,7 @@ describe RunningStat do
         running_stat.push(data.to_a[1])
       end
       it 'adds the data point' do
-        expect(Redis.current.hget(running_stat.send(:bucket_key), count_field)).to eq '2'
+        expect(Redis.current.hget(bucket_key, count_field)).to eq '2'
       end
     end
 
