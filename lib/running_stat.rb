@@ -4,6 +4,7 @@ require 'redis'
 
 require 'running_stat/redis_backend'
 require 'running_stat/lua/push_datum'
+require 'running_stat/lua/statistics'
 require 'running_stat/lua/variance'
 require 'running_stat/insufficient_data_error'
 require 'running_stat/invalid_data_error'

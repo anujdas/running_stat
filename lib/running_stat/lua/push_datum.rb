@@ -10,7 +10,9 @@ class RunningStat
     # Effects:
     #   calculates running stats (mean, variance, std_dev)
     # Returns:
-    #   nothing
+    #   the cardinality of the dataset, as an integer
+    #   the arithmetic mean of the dataset, as a stringified float
+    #   the sample variance of the dataset, as a stringified float
     PUSH_DATUM = <<-EOLUA
       local bucket_key = KEYS[1]
       local datum = ARGV[1]
@@ -20,7 +22,9 @@ class RunningStat
 
       local count = redis.call("HINCRBY", bucket_key, "#{RedisBackend::COUNT_FIELD}", 1)
       mean = redis.call("HINCRBYFLOAT", bucket_key, "#{RedisBackend::MEAN_FIELD}", tostring(delta / count))
-      redis.call("HINCRBYFLOAT", bucket_key, "#{RedisBackend::M2_FIELD}", tostring(delta * (datum - mean)))
+      local m2 = redis.call("HINCRBYFLOAT", bucket_key, "#{RedisBackend::M2_FIELD}", tostring(delta * (datum - mean)))
+
+      return {count, tostring(mean), tostring(m2 / (count - 1))}
     EOLUA
 
     PUSH_DATUM_SHA1 = Digest::SHA1.hexdigest(PUSH_DATUM).freeze
