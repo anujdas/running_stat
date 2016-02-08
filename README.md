@@ -28,7 +28,10 @@ stat = RunningStat.instance('my_bucket')  # uses Redis.current
 # or
 stat = RunningStat.instance('my_bucket', redis: Redis.new(db: 1))  # uses db 1 for stats
 # or
-stat = $redis_pool.with { |redis| RunningStat.new('my_bucket', redis: redis) }  # checks out from pool
+$redis_pool.with do |redis|  # check out conn from pool
+ stat = RunningStat.new('my_bucket', redis: redis)
+ # do something with stat
+end
 ```
 
 Now, for anything you want to measure, pick a bucket name and push your data:
